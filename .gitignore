@@ -1,2 +1,5 @@
+# MAC Files
+.DS_Store
+
 # IDE Files
 .idea/
