@@ -1,0 +1,14 @@
+Build a Tic-Tac-Toe (X/O) web app as a single self-contained HTML file
+(HTML + CSS + JavaScript, no external dependencies or build step).
+
+Requirements:
+- 3x3 grid, two human players alternating X and O, X goes first
+- Clicking an empty cell places the current player's mark; filled cells can't be overwritten
+- Detect and announce a win (all 8 lines) and highlight the winning three cells
+- Detect a draw when the board is full with no winner
+- Show whose turn it is, and the result when the game ends
+- A "Reset" button that clears the board and starts a new game
+- Clean, responsive layout that works on mobile and desktop
+
+Don't use any frameworks or CDNs — plain vanilla JS. The whole thing should
+run by opening the file in a browser.

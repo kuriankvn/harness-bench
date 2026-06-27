@@ -1,0 +1,14 @@
+Build a calculator web app as a single self-contained HTML file
+(HTML + CSS + JavaScript, no external dependencies or build step).
+
+Requirements:
+- Buttons for digits 0-9, decimal point, and operations +, −, ×, ÷
+- An "equals" button, a "clear" (C) button, and ideally a backspace/delete
+- A display showing the current input and result
+- Handle chained operations correctly: "2 + 3 × 4" should respect operator precedence
+- Handle edge cases: divide by zero, multiple decimals in one number, leading operators
+- Pressing equals repeatedly should behave sensibly (not crash or produce garbage)
+- Clean, responsive grid layout that works on mobile and desktop
+
+Don't use any frameworks or CDNs — plain vanilla JS. The whole thing should
+run by opening the file in a browser.

@@ -1,0 +1,15 @@
+Build a Snake game as a single self-contained HTML file
+(HTML + CSS + JavaScript, no external dependencies or build step).
+
+Requirements:
+- A grid-based play area rendered on a <canvas>
+- Arrow keys (and ideally WASD) control the snake's direction
+- The snake grows by one segment each time it eats food; food respawns at a
+  random empty cell
+- Game over on collision with a wall or with the snake's own body
+- Prevent instant 180-degree reversals (e.g. can't go straight from left to right)
+- Display the current score and a game-over state with a way to restart
+- Reasonable, constant game speed via a game loop
+
+Don't use any frameworks or CDNs — plain vanilla JS. The whole thing should
+run by opening the file in a browser.

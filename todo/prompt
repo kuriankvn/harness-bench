@@ -1,0 +1,15 @@
+Build a Todo list web app as a single self-contained HTML file
+(HTML + CSS + JavaScript, no external dependencies or build step).
+
+Requirements:
+- An input field and "Add" button to create new todos (also support pressing Enter)
+- Each todo can be marked complete (toggles a strikethrough style) and deleted
+- Filter buttons: All / Active / Completed
+- A counter showing how many active items remain
+- Persist todos to localStorage so they survive a page refresh, and re-render
+  from storage on load
+- Don't allow adding empty or whitespace-only todos
+- Clean, responsive layout that works on mobile and desktop
+
+Don't use any frameworks or CDNs — plain vanilla JS. The whole thing should
+run by opening the file in a browser.
