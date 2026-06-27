@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #e8e8e8;
+      padding: 16px;
+    }
+
+    .game {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 5vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    #status {
+      font-size: 1.125rem;
+      font-weight: 600;
+      min-height: 1.5em;
+      text-align: center;
+      color: #a0aec0;
+      transition: color 0.2s ease;
+    }
+
+    #status.turn-x { color: #63b3ed; }
+    #status.turn-o { color: #f687b3; }
+    #status.winner { color: #68d391; font-size: 1.25rem; }
+    #status.draw   { color: #f6e05e; font-size: 1.25rem; }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #2d3748;
+      border: 2px solid #4a5568;
+      border-radius: 10px;
+      font-size: clamp(2.25rem, 12vw, 3.5rem);
+      font-weight: 800;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .cell:hover:not(.taken):not(.winning) {
+      background: #3d4a5c;
+      border-color: #718096;
+    }
+
+    .cell:active:not(.taken):not(.winning) {
+      transform: scale(0.95);
+    }
+
+    .cell.taken {
+      cursor: default;
+    }
+
+    .cell.x { color: #63b3ed; }
+    .cell.o { color: #f687b3; }
+
+    .cell.winning {
+      background: #22543d;
+      border-color: #68d391;
+      animation: pulse 0.4s ease;
+    }
+
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    #reset {
+      padding: 14px 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: #4299e1;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    #reset:hover  { background: #3182ce; }
+    #reset:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <h1>Tic-Tac-Toe</h1>
+    <div id="status" class="turn-x">X's turn</div>
+    <div class="board" id="board" role="grid" aria-label="Tic-tac-toe board">
+      <button class="cell" data-index="0" aria-label="Cell 1"></button>
+      <button class="cell" data-index="1" aria-label="Cell 2"></button>
+      <button class="cell" data-index="2" aria-label="Cell 3"></button>
+      <button class="cell" data-index="3" aria-label="Cell 4"></button>
+      <button class="cell" data-index="4" aria-label="Cell 5"></button>
+      <button class="cell" data-index="5" aria-label="Cell 6"></button>
+      <button class="cell" data-index="6" aria-label="Cell 7"></button>
+      <button class="cell" data-index="7" aria-label="Cell 8"></button>
+      <button class="cell" data-index="8" aria-label="Cell 9"></button>
+    </div>
+    <button id="reset" type="button">Reset</button>
+  </div>
+
+  <script>
+    const WIN_LINES = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    const boardEl = document.getElementById('board');
+    const statusEl = document.getElementById('status');
+    const cells = Array.from(boardEl.querySelectorAll('.cell'));
+
+    let board = Array(9).fill(null);
+    let currentPlayer = 'X';
+    let gameOver = false;
+
+    function updateStatus(message, className) {
+      statusEl.textContent = message;
+      statusEl.className = className;
+    }
+
+    function findWinningLine() {
+      for (const [a, b, c] of WIN_LINES) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          return [a, b, c];
+        }
+      }
+      return null;
+    }
+
+    function highlightWin(line) {
+      line.forEach((index) => {
+        cells[index].classList.add('winning');
+      });
+    }
+
+    function handleCellClick(event) {
+      const cell = event.target.closest('.cell');
+      if (!cell || gameOver) return;
+
+      const index = Number(cell.dataset.index);
+      if (board[index]) return;
+
+      board[index] = currentPlayer;
+      cell.textContent = currentPlayer;
+      cell.classList.add('taken', currentPlayer.toLowerCase());
+      cell.disabled = true;
+
+      const winningLine = findWinningLine();
+      if (winningLine) {
+        gameOver = true;
+        highlightWin(winningLine);
+        updateStatus(`${currentPlayer} wins!`, 'winner');
+        cells.forEach((c) => { c.disabled = true; });
+        return;
+      }
+
+      if (board.every(Boolean)) {
+        gameOver = true;
+        updateStatus("It's a draw!", 'draw');
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      updateStatus(`${currentPlayer}'s turn`, `turn-${currentPlayer.toLowerCase()}`);
+    }
+
+    function resetGame() {
+      board = Array(9).fill(null);
+      currentPlayer = 'X';
+      gameOver = false;
+
+      cells.forEach((cell) => {
+        cell.textContent = '';
+        cell.className = 'cell';
+        cell.disabled = false;
+      });
+
+      updateStatus("X's turn", 'turn-x');
+    }
+
+    boardEl.addEventListener('click', handleCellClick);
+    document.getElementById('reset').addEventListener('click', resetGame);
+  </script>
+</body>
+</html>
