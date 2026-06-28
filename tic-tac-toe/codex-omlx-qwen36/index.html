@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a2e;
+      color: #e0e0e0;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    #status {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      min-height: 1.5em;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: min(320px, 85vw);
+      aspect-ratio: 1;
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #16213e;
+      border: 2px solid #0f3460;
+      border-radius: 12px;
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+    }
+
+    .cell:hover { background: #1a2a50; }
+    .cell:active { transform: scale(0.96); }
+
+    .cell.x { color: #e94560; }
+    .cell.o { color: #00d2ff; }
+
+    .cell.win {
+      background: #0f3460;
+      border-color: #e94560;
+      animation: pulse 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      to { transform: scale(1.06); }
+    }
+
+    #reset {
+      margin-top: 1.2rem;
+      padding: 0.6rem 1.8rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #e94560;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #reset:hover { background: #c0392b; }
+    #reset:active { transform: scale(0.97); }
+  </style>
+</head>
+<body>
+  <h1>Tic-Tac-Toe</h1>
+  <p id="status">X's turn</p>
+  <div id="board"></div>
+  <button id="reset">Reset</button>
+
+  <script>
+    (() => {
+      const WIN_LINES = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6],
+      ];
+
+      let board, current, over;
+
+      function init() {
+        board = Array(9).fill('');
+        current = 'X';
+        over = false;
+        document.getElementById('status').textContent = "X's turn";
+        render();
+      }
+
+      function checkWinner() {
+        for (const line of WIN_LINES) {
+          const [a, b, c] = line;
+          if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            return { winner: board[a], line };
+          }
+        }
+        return null;
+      }
+
+      function handleClick(e) {
+        const cell = e.target.closest('.cell');
+        if (!cell || over) return;
+        const idx = +cell.dataset.index;
+        if (board[idx]) return;
+
+        board[idx] = current;
+        const result = checkWinner();
+
+        if (result) {
+          over = true;
+          document.getElementById('status').textContent =
+            `Winner: ${result.winner}!`;
+          result.line.forEach(i => {
+            document.querySelector(`.cell[data-index="${i}"]`)
+              .classList.add('win');
+          });
+        } else if (board.every(c => c)) {
+          over = true;
+          document.getElementById('status').textContent = "It's a draw!";
+        } else {
+          current = current === 'X' ? 'O' : 'X';
+          document.getElementById('status').textContent =
+            `${current}'s turn`;
+        }
+
+        render();
+      }
+
+      function render() {
+        const boardEl = document.getElementById('board');
+        boardEl.innerHTML = '';
+        board.forEach((mark, i) => {
+          const cell = document.createElement('div');
+          cell.className = 'cell' + (mark ? ` ${mark.toLowerCase()}` : '');
+          cell.dataset.index = i;
+          cell.textContent = mark;
+          boardEl.appendChild(cell);
+        });
+      }
+
+      document.getElementById('board').addEventListener('click', handleClick);
+      document.getElementById('reset').addEventListener('click', init);
+      init();
+    })();
+  </script>
+</body>
+</html>
